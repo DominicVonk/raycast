@@ -9,29 +9,23 @@ interface Todo {
 }
 
 export default function Command () {
-    const [todos, setTodos] = useState<Todo[]>([
+    const [todos, setTodos] = useState<any[]>([
     ]);
     const [homey, setHomey] = useState<HomeyAPI>();
     useEffect(() => {
         if (!homey) {
             const fetchData = async () => {
+                let token = null;
+                const code = await LocalStorage.getItem('token') as string;
                 // Create a Cloud API instance
                 const cloudApi = new AthomCloudAPI({
                     clientId: '5a8d4ca6eb9f7a2c9d6ccf6d',
                     clientSecret: 'e3ace394af9f615857ceaa61b053f966ddcfb12a',
                     redirectUrl: 'http://localhost/oauth2/callback',
-                    debug: true,
+                    token: code ? JSON.parse(code) as AthomCloudAPI.Token : undefined,
+                    store: LocalStorage as unknown as AthomCloudAPI.StorageAdapter
                 });
 
-
-                const code = await LocalStorage.getItem('token') as string;
-                if (code) {
-                    try {
-                        await cloudApi.authenticateWithAuthorizationCode({ code: code });
-                    } catch (error) {
-                        console.log(error);
-                    }
-                }
                 const loggedIn = await cloudApi.isLoggedIn();
 
                 if (!loggedIn) {
@@ -77,14 +71,14 @@ export default function Command () {
                         console.log(error);
                     }
                     const data = await promise;
-                    await LocalStorage.setItem('token', data as string)
+                    token = (data as string)
 
                 }
 
-                const _code = await LocalStorage.getItem('token') as string;
-                if (_code) {
+                if (token) {
                     //await new Promise((r) => { setTimeout(r, 10000) });
-                    await cloudApi.authenticateWithAuthorizationCode({ code: _code });
+                    const _token = await cloudApi.authenticateWithAuthorizationCode({ code: token });
+                    await LocalStorage.setItem('token', JSON.stringify(_token));
                 }
                 // Get the logged in user
                 const user = (await cloudApi.getAuthenticatedUser({ additionalScopes: '' })) as AthomCloudAPI.User;
