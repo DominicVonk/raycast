@@ -12,9 +12,10 @@
   "commands": [
     {
       "name": "homey",
-      "title": "homey",
-      "description": "Homey Favourite Flows",
-      "mode": "view"
+      "title": "Run Homey Flows",
+      "description": "Run Homey Flows",
+      "mode": "view",
+      "icon": "8502422.png"
     }
   ],
   "dependencies": {
