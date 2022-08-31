@@ -3,10 +3,7 @@ import { AthomCloudAPI, HomeyAPI } from "homey-api";
 import { useState, useEffect } from "react";
 import express from 'express';
 import { LocalStorage } from "@raycast/api";
-interface Todo {
-    name: string;
-    isCompleted: boolean;
-}
+import { showToast, Toast } from "@raycast/api";
 
 class Storage extends AthomCloudAPI.StorageAdapter {
     async get (): Promise<any> {
@@ -122,8 +119,13 @@ export default function Command () {
             {todos.map((todo) => (
                 <List.Item title={todo.name} actions={<ActionPanel title={todo.name}>
                     <ActionPanel.Section>
-                        <Action title="Close Pull Request" onAction={async () => {
+                        <Action title="Run flow" onAction={async () => {
                             await homey.flow.triggerFlow({ id: todo.id });
+                            await showToast({
+                                title: "Flow triggered",
+                                message: todo.name,
+                                style: Toast.Style.Success,
+                            })
                         }}></Action>
                     </ActionPanel.Section>
                 </ActionPanel>} />
