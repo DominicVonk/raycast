@@ -8,6 +8,16 @@ interface Todo {
     isCompleted: boolean;
 }
 
+class Storage extends AthomCloudAPI.StorageAdapter {
+    async get (): Promise<any> {
+        const data = await LocalStorage.getItem('athom');
+        return data ? JSON.parse(data) : {};
+    }
+    async set (value: any): Promise<void> {
+        return LocalStorage.setItem('athom', JSON.stringify(value));
+    }
+}
+
 export default function Command () {
     const [todos, setTodos] = useState<any[]>([
     ]);
@@ -16,16 +26,17 @@ export default function Command () {
         if (!homey) {
             const fetchData = async () => {
                 let token = null;
-                const code = await LocalStorage.getItem('token') as string;
+                const code = await LocalStorage.getItem('_token') as string;
+                const __token = new AthomCloudAPI.Token(JSON.parse(code));
+
                 // Create a Cloud API instance
                 const cloudApi = new AthomCloudAPI({
                     clientId: '5a8d4ca6eb9f7a2c9d6ccf6d',
                     clientSecret: 'e3ace394af9f615857ceaa61b053f966ddcfb12a',
                     redirectUrl: 'http://localhost/oauth2/callback',
-                    token: code ? JSON.parse(code) as AthomCloudAPI.Token : undefined,
-                    store: LocalStorage as unknown as AthomCloudAPI.StorageAdapter
+                    token: code ? __token : undefined,
+                    store: new Storage()
                 });
-
                 const loggedIn = await cloudApi.isLoggedIn();
 
                 if (!loggedIn) {
@@ -78,7 +89,7 @@ export default function Command () {
                 if (token) {
                     //await new Promise((r) => { setTimeout(r, 10000) });
                     const _token = await cloudApi.authenticateWithAuthorizationCode({ code: token });
-                    await LocalStorage.setItem('token', JSON.stringify(_token));
+                    await LocalStorage.setItem('_token', JSON.stringify(_token));
                 }
                 // Get the logged in user
                 const user = (await cloudApi.getAuthenticatedUser({ additionalScopes: '' })) as AthomCloudAPI.User;
