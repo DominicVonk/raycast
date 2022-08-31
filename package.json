@@ -5,6 +5,8 @@
   "description": "Homey Favourite Flows",
   "icon": "command-icon.png",
   "author": "DominicVonk",
+  "owner": "dominicvonk",
+  "access": "public",
   "categories": [
     "Productivity"
   ],
