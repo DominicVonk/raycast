@@ -16,7 +16,7 @@ class Storage extends AthomCloudAPI.StorageAdapter {
 }
 
 export default function Command () {
-    const [todos, setTodos] = useState<any[]>([
+    const [flows, setFlows] = useState<any[]>([
     ]);
     const [homey, setHomey] = useState<HomeyAPI>();
     useEffect(() => {
@@ -24,14 +24,16 @@ export default function Command () {
             const fetchData = async () => {
                 let token = null;
                 const code = await LocalStorage.getItem('_token') as string;
-                const __token = new AthomCloudAPI.Token(JSON.parse(code));
-
+                let __token = undefined;
+                if (code) {
+                    __token = new AthomCloudAPI.Token(JSON.parse(code));
+                }
                 // Create a Cloud API instance
                 const cloudApi = new AthomCloudAPI({
                     clientId: '5a8d4ca6eb9f7a2c9d6ccf6d',
                     clientSecret: 'e3ace394af9f615857ceaa61b053f966ddcfb12a',
                     redirectUrl: 'http://localhost/oauth2/callback',
-                    token: code ? __token : undefined,
+                    token: __token,
                     store: new Storage()
                 });
                 const loggedIn = await cloudApi.isLoggedIn();
@@ -42,7 +44,7 @@ export default function Command () {
                     const client = new OAuth.PKCEClient({
                         redirectMethod: OAuth.RedirectMethod.Web,
                         providerName: "Homey",
-                        providerIcon: "twitter-logo.png",
+                        providerIcon: "8502422.png",
                         description: "Connect your Homey account...",
 
                     });
@@ -93,7 +95,6 @@ export default function Command () {
                 // Get the first Homey of the logged in user
                 const homey = await user.getFirstHomey();
 
-                console.log(homey);
                 // Create a session on this Homey
                 const homeyApi = (await homey.authenticate() as HomeyAPI);
 
@@ -108,7 +109,7 @@ export default function Command () {
         if (homey) {
             const fetchData = async () => {
                 const todos = await homey.flow.getFlows()
-                setTodos(Object.values(todos).filter(e => e.triggerable));
+                setFlows(Object.values(todos).filter(e => e.triggerable));
             }
             fetchData();
         }
@@ -116,14 +117,14 @@ export default function Command () {
 
     return (
         <List>
-            {todos.map((todo) => (
-                <List.Item title={todo.name} actions={<ActionPanel title={todo.name}>
+            {flows.map((flow) => (
+                <List.Item key={flow.id} title={flow.name} actions={<ActionPanel title={flow.name}>
                     <ActionPanel.Section>
                         <Action title="Run flow" onAction={async () => {
-                            await homey.flow.triggerFlow({ id: todo.id });
+                            await homey.flow.triggerFlow({ id: flow.id });
                             await showToast({
                                 title: "Flow triggered",
-                                message: todo.name,
+                                message: flow.name,
                                 style: Toast.Style.Success,
                             })
                         }}></Action>
