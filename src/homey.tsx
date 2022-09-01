@@ -1,4 +1,4 @@
-import { List, OAuth, Action, ActionPanel } from "@raycast/api";
+import { List, OAuth, Action, ActionPanel, Icon } from "@raycast/api";
 import { AthomCloudAPI, HomeyAPI, HomeyAPIV3, HomeyAPIV3Cloud, HomeyAPIV3Local } from "homey-api";
 import { useState, useEffect } from "react";
 import express from 'express';
@@ -139,9 +139,8 @@ export default function Command () {
                 const todos = await homeyApi.flow.getFlows();
                 const flows = Object.values(todos);
                 for (const flow of flows) {
-                    if (flow.triggerable && flow.enabled) {
-                        directory[flow.folder || 'general'].flows.push(flow);
-                    }
+                    directory[flow.folder || 'general'].flows.push(flow);
+
                 }
                 //  console.log(todos);
                 //@ts-ignore
@@ -156,9 +155,9 @@ export default function Command () {
             {flows.sort((a, b) => Math.sign(b.order - a.order)).map((folder) => (
                 <List.Section key={folder.name} title={folder.name}>
                     {folder.flows && folder.flows.sort((a, b) => Math.sign(b.order - a.order)).map((flow) => (
-                        <List.Item key={flow.id} title={flow.name} actions={<ActionPanel title={flow.name}>
+                        <List.Item key={flow.id} icon={flow.triggerable && flow.enabled ? Icon.PlayFilled : Icon.XMarkCircleFilled} title={flow.name} actions={<ActionPanel title={flow.name}>
                             <ActionPanel.Section>
-                                <Action title="Run flow" onAction={async () => {
+                                {flow.triggerable && flow.enabled && <Action title="Run flow" onAction={async () => {
 
                                     //@ts-ignore
                                     await homeyApi.flow.triggerFlow({ id: flow.id });
@@ -167,7 +166,7 @@ export default function Command () {
                                         message: flow.name,
                                         style: Toast.Style.Success,
                                     })
-                                }}></Action>
+                                }}></Action>}
                                 <Action.OpenInBrowser title="Goto flow editor" url={'https://my.homey.app/homeys/' + homey.id + '/flows/' + flow.id}></Action.OpenInBrowser>
                             </ActionPanel.Section>
                         </ActionPanel>} />
