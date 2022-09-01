@@ -1,4 +1,4 @@
-import { List, OAuth, Action, ActionPanel, Icon } from "@raycast/api";
+import { List, OAuth, Action, ActionPanel, Icon, Color } from "@raycast/api";
 import { AthomCloudAPI, HomeyAPI, HomeyAPIV3, HomeyAPIV3Cloud, HomeyAPIV3Local } from "homey-api";
 import { useState, useEffect } from "react";
 import express from 'express';
@@ -155,7 +155,7 @@ export default function Command () {
             {flows.sort((a, b) => Math.sign(b.order - a.order)).map((folder) => (
                 <List.Section key={folder.name} title={folder.name}>
                     {folder.flows && folder.flows.sort((a, b) => Math.sign(b.order - a.order)).map((flow) => (
-                        <List.Item key={flow.id} icon={flow.triggerable && flow.enabled ? Icon.PlayFilled : Icon.XMarkCircleFilled} title={flow.name} actions={<ActionPanel title={flow.name}>
+                        <List.Item key={flow.id} icon={{ source: flow.triggerable && flow.enabled ? Icon.PlayFilled : Icon.XMarkCircleFilled, tintColor: flow.triggerable && flow.enabled ? Color.Green : Color.Red }} title={flow.name} actions={<ActionPanel title={flow.name}>
                             <ActionPanel.Section>
                                 {flow.triggerable && flow.enabled && <Action title="Run flow" onAction={async () => {
 
