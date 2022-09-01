@@ -18,9 +18,10 @@ class Storage extends AthomCloudAPI.StorageAdapter {
 export default function Command () {
     const [flows, setFlows] = useState<any[]>([
     ]);
-    const [homey, setHomey] = useState<HomeyAPI>();
+    const [homeyApi, setHomeyApi] = useState<HomeyAPI>();
+    const [homey, setHomey] = useState<any>();
     useEffect(() => {
-        if (!homey) {
+        if (!homeyApi) {
             const fetchData = async () => {
                 let token = null;
                 const code = await LocalStorage.getItem<string>('_token') as string;
@@ -101,13 +102,13 @@ export default function Command () {
                 const user = (await cloudApi.getAuthenticatedUser({ additionalScopes: '' })) as AthomCloudAPI.User;
                 // Get the first Homey of the logged in user
                 const homey = await user.getFirstHomey();
-
+                setHomey(homey);
                 // Create a session on this Homey
 
                 //@ts-ignore
                 const homeyApi = await homey.authenticate();
 
-                setHomey(homeyApi);
+                setHomeyApi(homeyApi);
             }
 
             fetchData();
@@ -115,10 +116,10 @@ export default function Command () {
     }, [])
 
     useEffect(() => {
-        if (homey) {
+        if (homeyApi) {
             const fetchData = async () => {
                 const directory: { [key: string]: { name: string, order: number, flows: any[] } } = {}
-                const flowFolders = await homey.flow.getFlowFolders();
+                const flowFolders = await homeyApi.flow.getFlowFolders();
                 const folders = Object.values(flowFolders);
                 directory['general'] = {
                     id: 'general',
@@ -135,7 +136,7 @@ export default function Command () {
                     };
                 }
                 //@ts-ignore
-                const todos = await homey.flow.getFlows();
+                const todos = await homeyApi.flow.getFlows();
                 const flows = Object.values(todos);
                 for (const flow of flows) {
                     if (flow.triggerable && flow.enabled) {
@@ -148,7 +149,7 @@ export default function Command () {
             }
             fetchData();
         }
-    }, [homey]);
+    }, [homeyApi]);
 
     return (
         <List>
@@ -160,13 +161,14 @@ export default function Command () {
                                 <Action title="Run flow" onAction={async () => {
 
                                     //@ts-ignore
-                                    await homey.flow.triggerFlow({ id: flow.id });
+                                    await homeyApi.flow.triggerFlow({ id: flow.id });
                                     await showToast({
                                         title: "Flow triggered",
                                         message: flow.name,
                                         style: Toast.Style.Success,
                                     })
                                 }}></Action>
+                                <Action.OpenInBrowser title="Goto flow editor" url={'https://my.homey.app/homeys/' + homey.id + '/flows/' + flow.id}></Action.OpenInBrowser>
                             </ActionPanel.Section>
                         </ActionPanel>} />
 
