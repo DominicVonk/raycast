@@ -42,7 +42,11 @@ export default function Command () {
                     {deviceGroup.devices && deviceGroup.devices.sort((a, b) => a.name.localeCompare(b.name)).map((device) => (
                         <List.Item key={device.id}
                             icon={{ source: device?.capabilitiesObj?.onoff ? (device?.capabilitiesObj?.onoff?.value ? 'toggle-on.svg' : 'toggle-off.svg') : Icon.Link, tintColor: !device.capabilitiesObj.onoff ? Color.PrimaryText : device?.capabilitiesObj?.onoff?.value ? Color.Green : Color.Red }}
-
+                            accessories={
+                                !device?.available ? [
+                                    { icon: { source: Icon.Warning, tintColor: Color.Orange } },
+                                ] : []
+                            }
                             actions={<ActionPanel title={device.name}>
                                 <ActionPanel.Section>
                                     {device?.capabilitiesObj?.onoff &&
