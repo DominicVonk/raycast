@@ -44,7 +44,8 @@ export default function Command () {
                             icon={{ source: device?.capabilitiesObj?.onoff ? (device?.capabilitiesObj?.onoff?.value ? 'toggle-on.svg' : 'toggle-off.svg') : Icon.Link, tintColor: !device.capabilitiesObj.onoff ? Color.PrimaryText : device?.capabilitiesObj?.onoff?.value ? Color.Green : Color.Red }}
                             accessories={
                                 !device?.available ? [
-                                    { icon: { source: Icon.Warning, tintColor: Color.Orange } },
+                                    { icon: { source: Icon.Warning, tintColor: Color.Orange }, tooltip: device?.unavailableMessage ? device?.unavailableMessage : 'Unavailable' },
+
                                 ] : []
                             }
                             actions={<ActionPanel title={device.name}>
