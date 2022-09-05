@@ -128,6 +128,13 @@ export class Homey {
         for (const flow of flows) {
             directory[flow.folder || 'general'].flows.push(flow);
         }
+        //@ts-ignore
+        const todos2 = await this.homeyApi.flow.getAdvancedFlows();
+        const flows2 = Object.values(todos2);
+        for (const flow of flows2) {
+            flow.advanced = true;
+            directory[flow.folder || 'general'].flows.push(flow);
+        }
         return Object.values(directory);
     }
 

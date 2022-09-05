@@ -41,7 +41,7 @@ export default function Command () {
                                         style: Toast.Style.Success,
                                     })
                                 }}></Action>}
-                                <Action.OpenInBrowser title="Goto Flow Editor" url={'https://my.homey.app/homeys/' + homey.getHomey().id + '/flows/' + flow.id}></Action.OpenInBrowser>
+                                <Action.OpenInBrowser title="Goto Flow Editor" url={'https://my.homey.app/homeys/' + homey.getHomey().id + '/flows/' + (flow?.advanced ? 'advanced/' : '') + flow.id}></Action.OpenInBrowser>
                             </ActionPanel.Section>
                         </ActionPanel>} />
 
