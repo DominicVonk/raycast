@@ -33,7 +33,7 @@ export default function Command () {
                                 {flow.triggerable && flow.enabled && <Action title="Start Flow" onAction={async () => {
 
                                     //@ts-ignore
-                                    homey.triggerFlow(flow.id);
+                                    homey.triggerFlow(flow.id, flow?.advanced);
 
                                     await showToast({
                                         title: "Flow triggered",

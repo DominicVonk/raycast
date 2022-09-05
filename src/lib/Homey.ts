@@ -164,8 +164,12 @@ export class Homey {
         return Object.values(directory);
     }
 
-    async triggerFlow (id) {
-        await this.homeyApi.flow.triggerFlow({ id: id });
+    async triggerFlow (id, advanced = false) {
+        if (advanced) {
+            await this.homeyApi.flow.triggerAdvancedFlow({ id });
+        } else {
+            await this.homeyApi.flow.triggerFlow({ id: id });
+        }
     }
 
     async toggleDevice (id) {
